@@ -1,6 +1,6 @@
 package kate
 
-//Statistics are the results based on trades executed on a backtest run
+// Statistics are the results based on trades executed on a backtest run
 type Statistics struct {
 	ROIPercentage   float64
 	NetProfit       float64
@@ -9,9 +9,10 @@ type Statistics struct {
 	MaxDrawdown     float64 //Percentage for the maximum drawdown after applying the strategy
 	TotalTrades     int
 	TotalDataPoints int
+	TradeHistory    []*Position
 }
 
-//calculateStatistics calculates metrics based on a trade history
+// calculateStatistics calculates metrics based on a trade history
 func (bt *Backtester) calculateStatistics(initialBalance float64) *Statistics {
 	tradeHistory := bt.exchangeHandler.tradeHistory
 	wins, balance, peakProfit, bottomProfit := 0, initialBalance, 0.0, 0.0
@@ -41,6 +42,7 @@ func (bt *Backtester) calculateStatistics(initialBalance float64) *Statistics {
 		WinRate:         float64(wins) / float64(len(tradeHistory)),
 		MaxDrawdown:     (peakProfit - bottomProfit) / peakProfit,
 		TotalDataPoints: len(bt.dataHandler.Prices),
+		TradeHistory:    tradeHistory,
 	}
 
 	stats.SharpeRatio = sharpe(stats.NetProfit, 0.0, stdDev(balanceHistory))
